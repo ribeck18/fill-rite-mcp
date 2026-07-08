@@ -1,0 +1,11 @@
+[project]
+name = "fillrite-mcp"
+version = "0.1.0"
+description = "MCP for AI Agents to interact with the fillrite web app. This will allow users agents to check fuel, make transactions, keep track of tank status and more."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.28.1",
+    "requests>=2.34.2",
+]
