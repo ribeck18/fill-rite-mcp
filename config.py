@@ -10,7 +10,7 @@ from pathlib import Path
 from errors import FillriteAuthError, FillriteError, FillriteResponseError
 
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 TOKEN_FILE = Path(__file__).parent / "tokens.json"
 
 
@@ -67,7 +67,7 @@ def refresh_tokens() -> str:
     url = f"https://fmsapi.fillrite.com/rest/refresh-token/{refresh_token}"
     headers = {
         "Authorization": get_token_data(TokenType.ACCESS_TOKEN)["token"],
-        "Content-Type": "application/x-www-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded",
     }
     payload = {}
 

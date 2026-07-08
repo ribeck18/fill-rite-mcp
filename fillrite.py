@@ -4,7 +4,7 @@ from mcp.server.fastmcp import FastMCP
 
 from config import auth_token, base_url  # https://fmsapi.fillrite.com/rest/v1.0/
 
-mcp = FastMCP("fillrite")
+mcp = FastMCP("Fill-Rite")
 
 
 # Helper functions

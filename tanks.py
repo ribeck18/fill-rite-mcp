@@ -1,17 +1,20 @@
 import json
-from fillrite import api_get, api_patch
+from fillrite import api_get, api_patch, mcp
 
 
+@mcp.tool()
 def get_all_tanks() -> str:
     return api_get("tank", "application/x-www-form-urlencoded")["result"]
 
 
+@mcp.tool()
 def get_single_tank_detail(tank_id: int):
-    return api_get(f"tank/{tank_id}", "application./json")["result"]
+    return api_get(f"tank/{tank_id}", "application/json")["result"]
 
 
+@mcp.tool()
 def update_tank_inventory(tank_id: int, new_inventory: int) -> str:
-    tank_current = api_get(f"tank{tank_id}", "application./json")
+    tank_current = api_get(f"tank/{tank_id}", "application/json")
     if not tank_current["success"]:
         return tank_current["result"]
 

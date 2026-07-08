@@ -1,10 +1,8 @@
-from tanks import get_single_tank_detail, get_all_tanks
+from fillrite import mcp
 
 
 def main():
-    print(get_all_tanks())
-    print("\n\n\n\n\n----------------------")
-    print(get_single_tank_detail(213758))
+    mcp.run()
 
 
 if __name__ == "__main__":
