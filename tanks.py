@@ -4,12 +4,16 @@ from fillrite import api_get, api_patch, mcp
 
 @mcp.tool()
 def get_all_tanks() -> str:
-    return api_get("tank", "application/x-www-form-urlencoded")["result"]
+    return json.dumps(
+        api_get("tank", "application/x-www-form-urlencoded")["result"], indent=2
+    )
 
 
 @mcp.tool()
-def get_single_tank_detail(tank_id: int):
-    return api_get(f"tank/{tank_id}", "application/json")["result"]
+def get_single_tank_detail(tank_id: int) -> str:
+    return json.dumps(
+        api_get(f"tank/{tank_id}", "application/json")["result"], indent=2
+    )
 
 
 @mcp.tool()
@@ -29,7 +33,7 @@ def update_tank_inventory(tank_id: int, new_inventory: int) -> str:
     updated = api_patch(f"tank/adjust-inventory/{tank_id}", payload)
     if not updated["success"]:
         return updated["result"]
-    return f"Inventory for tank {tank_id} has been updated to {new_inventory} {json.dumps(updated['result'], indent=4)}"
+    return f"Inventory for tank {tank_id} has been updated to {new_inventory} {json.dumps(updated['result'], indent=2)}"
 
 
 def set_tank_details():

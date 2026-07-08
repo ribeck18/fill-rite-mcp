@@ -1,4 +1,5 @@
 from fillrite import mcp
+import tanks, sites, vehicles, drivers
 
 
 def main():
