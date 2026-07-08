@@ -51,3 +51,61 @@ I have only tested this on macOS, and these setup steps assume you use macOS. In
 ```
 
 Your MCP should now function properly in Claude Code.
+
+### Claude Desktop
+
+1. Navigate to the directory you want to run the MCP in and clone the repo:
+
+```
+   git clone https://github.com/ribeck18/fill-rite-mcp.git
+```
+
+2. In the directory you just cloned, make a new file called `tokens.json`. Paste the following into it, replacing the placeholders with your API tokens from Fill-Rite:
+
+```json
+   {
+       "access_token": {
+           "token": "{your_access_token}",
+           "expires_at": ""
+       },
+       "refresh_token": {
+           "token": "{your_refresh_token}"
+       }
+   }
+```
+
+   Make sure your access token starts with "Bearer ". Leave `expires_at` blank for now.
+
+3. In the same directory, make a file called `.env`. Paste the following into it:
+
+```
+   BASE_URL=https://fmsapi.fillrite.com/rest/v1.0/
+```
+
+4. Navigate to your claude desktop config file. If it does not exist, create it.
+
+```
+    ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+5. Add the following to that file.
+
+```
+    {
+        "mcpServers": {
+            "Fill-Rite": {
+                "command": "{path_to_uv}",
+                "args": [
+                    "run",
+                    "--directory",
+                    "{path_to_cloned_repo}",
+                    "main.py"
+                ]
+            }
+        }
+    }
+```
+
+Your path to uv can be found with `which uv`.
+
+6. Restart your Claude Desktop app. After restart the MCP should function.
