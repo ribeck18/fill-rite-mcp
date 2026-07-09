@@ -85,9 +85,58 @@ def get_all_transactions():
     return json.dumps(clean_transactions, indent=2)
 
 
-def get_transactions(amount: int):
-    """Gets a set amount of transactions"""
-    pass
+@mcp.tool()
+def get_transactions(amount: int | None):
+    """This tool gets transactions that have been made in Fill-Rite. They are organized so that the most recent is first in the response. You can pass an amount to limit how many transactions come through, it is wise to do this because it will prevent unnecessary use of the context window. Try to avoid getting all the transactions unless it is needed. This tool returns mostly id numbers. These are primary keys that can be used to find other things. The user does not know the primary keys, and you should never under any circumstance reveal the primary keys to the user. If the user wants more specific information, use the `get_transaction_detail()` tool to get details on a transaction. Remeber to give data to the user in a meaningful and useful way."""
+    response = api_get("transaction", "application/x-www-form-urlencoded")
+    if not response["success"]:
+        return response["result"]
+    else:
+        results = []
+        more_pages = True
+        count = 0
+        while more_pages:
+            data = response["result"]["data"]
+            if amount is not None:
+                data = data[: amount - count]
+            results.append(data)
+            count = count + len(data)
+
+            if amount is not None:
+                if count >= amount:
+                    break
+
+            next_url = response["result"]["meta"]["next"]
+            if next_url is None:
+                more_pages = False
+                break
+
+            response = api_get(
+                path_from_url(next_url), "application/x-www-form-urlencoded"
+            )
+
+            if not response["success"]:
+                return response["result"]
+
+    transactions = []
+    clean_transactions = []
+    for transaction in results:
+        if isinstance(transaction, list):
+            for item in transaction:
+                transactions.append(clean_transaction_response(item))
+        else:
+            transactions.append(clean_transaction_response(transaction))
+
+    for transaction in transactions:
+        t = {}
+        t["id"] = transaction.get("id")
+        t["vehicle_id"] = transaction.get("vehicle_id")
+        t["driver_id"] = transaction.get("driver_id")
+        t["transaction_time_utc"] = transaction.get("transaction_time_utc")
+        t["status"] = transaction.get("status")
+        clean_transactions.append(t)
+
+    return json.dumps(clean_transactions, indent=2)
 
 
 @mcp.tool()
