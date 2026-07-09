@@ -1,5 +1,6 @@
 import json
 import requests
+from urllib.parse import urlparse
 from mcp.server.fastmcp import FastMCP
 
 from config import auth_token, base_url  # https://fmsapi.fillrite.com/rest/v1.0/
@@ -10,8 +11,24 @@ mcp = FastMCP("Fill-Rite")
 # Helper functions
 
 
+def path_from_url(url: str) -> str:
+    parsed = urlparse(url)
+    path = parsed.path
+    prefix = "/rest/v1.0/"
+
+    if path.startswith(prefix):
+        path = path[len(prefix) :]
+    else:
+        path = path.lstrip("/")
+
+    if parsed.query:
+        return f"{path}?{parsed.query}"
+
+    return path
+
+
 def api_get(path: str, content_type: str, payload: dict | None = None) -> dict:
-    """makes a get request to the fuelrite api"""
+    """makes a get request to the fuelrite api."""
     url = base_url + path
     headers = {
         "Authorization": auth_token(),

@@ -1,10 +1,9 @@
 import json
-from fillrite import api_get, api_patch, mcp
+from fillrite import api_get, api_patch, mcp, path_from_url
 
 
 def clean_tank_response(data: dict) -> dict:
     """Cleans the tank response so that private information, and unwanted data is not given to the agent."""
-
     result = {}
     product = data.get("product", {})
     if isinstance(product, list):
@@ -72,18 +71,42 @@ def get_all_tanks() -> str:
     if isinstance(response, str):
         return response
     else:
-        if isinstance(response, dict):
-            response = response.values()
+        results = []
+        more_pages = True
+        while more_pages:
+            data = response["result"]["data"]
+            results.append(data)
+
+            next_url = response["result"]["meta"]["next"]
+            if next_url is None:
+                more_pages = False
+                break
+
+            response = api_get(
+                path_from_url(next_url), "application/x-www-form-urlencoded"
+            )
+
+            if not response["success"]:
+                return response["result"]
 
         tanks = []
-        for tank in response:
+        clean_tanks = []
+        for tank in results:
             if isinstance(tank, list):
                 for item in tank:
                     tanks.append(clean_tank_response(item))
             else:
                 tanks.append(clean_tank_response(tank))
 
-        return json.dumps(tanks, indent=2)
+        for tank in tanks:
+            t = {}
+            t["id"] = tank.get("id")
+            t["name"] = tank.get("name")
+            t["product"] = tank.get("tank_product").get("product_name")
+            t["current_inventory"] = tank.get("current_inventory")
+            clean_tanks.append(t)
+
+        return json.dumps(clean_tanks, indent=2)
 
 
 @mcp.tool()
